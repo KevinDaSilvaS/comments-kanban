@@ -1,0 +1,90 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 2a2f345cfc7aa82a2421eeb97934b5ab1da6a9643054b65ed2daf4c7a2a970ab
+
+name:           comments-kanban
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/comments-kanban#readme>
+homepage:       https://github.com/githubuser/comments-kanban#readme
+bug-reports:    https://github.com/githubuser/comments-kanban/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/comments-kanban
+
+library
+  exposed-modules:
+      Lib, 
+      BaseTypes.Comment, 
+      BaseTypes.BaseTypes,
+      BaseTypes.PostRequest,
+      BaseTypes.PatchRequest,
+      BaseTypes.SpockApi,
+      Errors.ErrorResponse,
+      Errors.ErrorMessages,
+      Services.GetComment,
+      Services.GetAllComments,
+      Services.InsertComment,
+      Services.DeleteComment,
+      Services.UpdateComment,
+      Operations.Mongolia.Auth
+  other-modules:
+      Paths_comments_kanban
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+      , aeson
+      , Spock
+      , text
+      , http-types
+      , http-conduit
+      , bytestring
+  default-language: Haskell2010
+
+executable comments-kanban-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_comments_kanban
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , comments-kanban
+    , base
+    , aeson
+    , Spock
+    , text
+    , http-types
+    , http-conduit
+    , bytestring
+    , wai-cors
+    , containers
+  default-language: Haskell2010
+
+test-suite comments-kanban-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_comments_kanban
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , comments-kanban
+  default-language: Haskell2010

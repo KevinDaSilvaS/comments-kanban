@@ -1,0 +1,23 @@
+version: '3.7'
+
+services: 
+    mongo:
+        image: mongo
+        environment: 
+            - MONGO_INITDB_ROOT_USERNAME=kevin
+            - MONGO_INITDB_ROOT_PASSWORD=kevin
+            - MONGO_INITDB_DATABASE=admin
+        ports: 
+            - "27017:27017"
+
+    mongolia:
+        image: kevindasilvas/mongolia
+        environment: 
+            - MONGO_USERNAME=kevin
+            - MONGO_PASSWORD=kevin
+            - MONGODB_NAME=admin
+            - MONGODB_HOST=mongo
+            - MONGODB_PORT=27017 
+        ports: 
+            - "3170:3170"
+            
