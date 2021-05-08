@@ -14,13 +14,9 @@ import Services.DeleteComment  ( deleteComment )
 import Services.UpdateComment  ( updateComment )
 
 import Network.Wai.Middleware.Cors
-import Operations.Mongolia.Auth
-import Operations.Mongolia.CreateCollection
 
 main :: IO ()
 main = do
-    authRequest <- auth
-    collectionCreationRequest <- createCollections
     spockCfg <- defaultSpockCfg () PCNoDatabase ()
     runSpock 8835 (spock spockCfg app)
 
