@@ -10,11 +10,11 @@ import BaseTypes.SpockApi ( Api, ApiAction )
 import qualified BaseTypes.PostRequest as PR
 import Errors.ErrorMessages
 import Data.Maybe (isNothing)
-
-import Operations.Mongolia.InsertComment as OPS
 import BaseTypes.Mongolia.GetTypes
 
 import qualified Data.Aeson as Aeson
+import Operations.Mongo.MongoDBOperations
+import Control.Monad.Trans (liftIO)
 
 insertComment :: Api
 insertComment = do
@@ -27,16 +27,8 @@ insertComment = do
             let code = getResponseStatusCode response
 
             if code == 200 then do
-                let v = OPS.insertComment body
-                response <- httpLBS "http://localhost:3170/collections/comments"
-                let statusCode = getResponseStatusCode response
-                if statusCode == 201 then do
-                    let jsonBody = getResponseBody response
-                    let (Just decodedBody) = Aeson.decode jsonBody :: Maybe GetResponse
-                    let parsedBody = serializeGet decodedBody
-                    setStatus status201 >> json parsedBody
-                else
-                    setStatus status500 >> _INTERNAL_SERVER_ERROR
+                r <- liftIO $ server
+                setStatus status201 >> json r
             else if code == 404 then
                 setStatus status404 >> _BOARD_NOT_FOUND
             else

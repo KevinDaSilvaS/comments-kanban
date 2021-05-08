@@ -25,6 +25,13 @@ packages:
       sha256: 0a27afabb1730147d6aa0ddf5cc6368951c4625e3706cb8f5388da9739372fa3
   original:
     hackage: reroute-0.6.0.0
+- completed:
+    hackage: AesonBson-0.4.0@sha256:fb368ec6f750d582c0630b2eb0d562d7eecab87da4a099593746298b27184a95,1333
+    pantry-tree:
+      size: 378
+      sha256: c77494ff9ecf48cf4675e4973f8cbcf946e5a4badb023c50ea5a7c788aced7b4
+  original:
+    hackage: AesonBson-0.4.0
 snapshots:
 - completed:
     size: 567037
