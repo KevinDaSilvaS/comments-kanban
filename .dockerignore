@@ -1,0 +1,7 @@
+.docker
+collections
+docker-compose.yml
+Dockerfile
+.dockerignore
+.stack-work
+.env
