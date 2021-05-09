@@ -6,10 +6,12 @@ import Web.Spock
 import Network.HTTP.Types
 
 import BaseTypes.SpockApi ( Api, ApiAction )
+import Operations.Mongo.MongoDBOperations as MongoOperations
+import Control.Monad.Trans (liftIO)
 
 deleteComment :: Api
 deleteComment = do
     delete ("comments" <//> var) $ \commentId -> do
-        let v = commentId ++ "!"
+        comment <- liftIO $ MongoOperations.deleteComment commentId
         setStatus noContent204
     

@@ -8,13 +8,16 @@ import Network.HTTP.Simple
 
 import BaseTypes.SpockApi ( Api, ApiAction )
 import qualified BaseTypes.PostRequest as PR
+import BaseTypes.Comment
 import Errors.ErrorMessages
 import Data.Maybe (isNothing)
-import BaseTypes.Mongolia.GetTypes
 
 import qualified Data.Aeson as Aeson
-import Operations.Mongo.MongoDBOperations
+import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
+
+import Data.UUID
+import Data.UUID.V1 ( nextUUID )
 
 insertComment :: Api
 insertComment = do
@@ -23,12 +26,24 @@ insertComment = do
         if isNothing body then
             setStatus status400 >> _PARSING_POST_BODY
         else do
+            let (Just sanitizeBody) = body
             response <- httpLBS "http://httpbin.org/get"
             let code = getResponseStatusCode response
 
             if code == 200 then do
-                r <- liftIO $ server
-                setStatus status201 >> json r
+                uuid <- liftIO nextUUID
+                let (Just sanitizedUUID) = uuid
+                let strUUID = toString sanitizedUUID
+
+                let comment = Comment {
+                    content   = PR.content sanitizeBody,
+                    taskId    = PR.taskId sanitizeBody,
+                    boardId   = PR.boardId sanitizeBody,
+                    commentId = strUUID
+                }
+
+                insertedComment <- liftIO $ MongoOperations.insertComment comment
+                setStatus status201 >> json insertedComment
             else if code == 404 then
                 setStatus status404 >> _BOARD_NOT_FOUND
             else

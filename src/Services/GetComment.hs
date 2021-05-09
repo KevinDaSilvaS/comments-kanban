@@ -8,12 +8,11 @@ import BaseTypes.Comment
     ( Comment(Comment, content, taskId, commentId, boardId) )
 import BaseTypes.SpockApi ( Api, ApiAction )
 
+import Operations.Mongo.MongoDBOperations as MongoOperations
+import Control.Monad.Trans (liftIO)
+
 getComment :: Api
 getComment = do
     get ("comments" <//> var <//> var) $ \taskId commentId -> do
-        json Comment { 
-            content   = "This a comment in a task", 
-            taskId    = taskId,
-            commentId = commentId,
-            boardId =  "ads3rf4"
-        }
+        comment <- liftIO $ MongoOperations.getComment taskId commentId
+        json comment
