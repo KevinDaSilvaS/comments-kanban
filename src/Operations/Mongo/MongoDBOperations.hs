@@ -65,7 +65,7 @@ getComment taskId commentId = do
     isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
         comment <- access pipe master txtDbName (getOneCommentOperation taskId commentId)
-        return $(aesonify . exclude ["_id"]) $ head comment
+        return $ map (aesonify . exclude ["_id"]) comment
     else
         error "Unable to connect to database"
 
