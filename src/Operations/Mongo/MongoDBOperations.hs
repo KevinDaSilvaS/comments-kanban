@@ -67,9 +67,6 @@ getAllCommentsOperation taskId = do rest =<< find (select ["taskId" =: taskId] "
 getOneCommentOperation :: String -> String -> Action IO [Document]
 getOneCommentOperation taskId commentId = do rest =<< find (select ["taskId" =: taskId, "commentId" =: commentId] "comments") {sort = []}
 
-insertRegister :: Action IO Value
-insertRegister = insert "links" ["url" =: "/boards/BOARDid/taskId/", "id" =: "/1458"]
-
 insertCommentOperation :: Com.Comment -> Action IO Value
 insertCommentOperation Com.Comment {
     Com.content    = content,
