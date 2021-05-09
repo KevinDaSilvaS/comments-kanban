@@ -31,7 +31,7 @@ services:
             - comments_app
 
     docs:
-        image: docs
+        image: comments_docs
         build: 
             context: ./collections
         ports: 
