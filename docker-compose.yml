@@ -9,15 +9,35 @@ services:
             - MONGO_INITDB_DATABASE=admin
         ports: 
             - "27017:27017"
+        networks:
+            - comments_app
 
-    mongolia:
-        image: kevindasilvas/mongolia
+    comments:
+        image: comments-app
         environment: 
-            - MONGO_USERNAME=kevin
-            - MONGO_PASSWORD=kevin
-            - MONGODB_NAME=admin
-            - MONGODB_HOST=mongo
-            - MONGODB_PORT=27017 
+            - MONGO_USERNAME=${MONGO_USERNAME}
+            - MONGO_PASSWORD=${MONGO_PASSWORD}
+            - MONGO_DB_NAME=${MONGO_DB_NAME}
+            - MONGO_HOST=mongo
+            - CHECK_TASK_URL=${CHECK_TASK_URL}
+        build: 
+            context: .
         ports: 
-            - "3170:3170"
+            - "${PORT}:8835"
+        links:
+            - mongo
+        networks:
+            #- kanban
+            - comments_app
+networks:
+    comments_app:
+        driver: bridge
+        name: comments_app 
+        # if your are not using kanban gateway to deploy the application
+        # just comment all the kanban network references in this docker-compose file ..
+        #kanban:
+            #driver: overlay
+            #name: kanban 
+                #external: 
+                #name: kanban
             
