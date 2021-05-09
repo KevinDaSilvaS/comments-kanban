@@ -5,6 +5,7 @@ module Services.InsertComment where
 import Web.Spock
 import Network.HTTP.Types
 import Network.HTTP.Simple
+import Network.HTTP.Conduit
 
 import BaseTypes.SpockApi ( Api, ApiAction )
 import qualified BaseTypes.PostRequest as PR
@@ -19,6 +20,9 @@ import Control.Monad.Trans (liftIO)
 import Data.UUID
 import Data.UUID.V1 ( nextUUID )
 
+import LoadEnv
+import System.Environment (lookupEnv)
+
 insertComment :: Api
 insertComment = do
     post "comments" $ do
@@ -26,8 +30,16 @@ insertComment = do
         if isNothing body then
             setStatus status400 >> _PARSING_POST_BODY
         else do
+            liftIO loadEnv
+            maybeUrl <- liftIO (lookupEnv "CHECK_TASK_URL")
+            let (Just url) = maybeUrl
             let (Just sanitizeBody) = body
-            response <- httpLBS "http://httpbin.org/get"
+            let boardId = PR.boardId sanitizeBody
+            let taskId = PR.taskId sanitizeBody
+
+            initReq <- liftIO $ parseRequest (url ++ boardId ++ taskId)
+            let req = initReq { method = "GET" }
+            response <- httpLBS req
             let code = getResponseStatusCode response
 
             if code == 200 then do
@@ -37,8 +49,8 @@ insertComment = do
 
                 let comment = Comment {
                     content   = PR.content sanitizeBody,
-                    taskId    = PR.taskId sanitizeBody,
-                    boardId   = PR.boardId sanitizeBody,
+                    taskId    = taskId,
+                    boardId   = boardId,
                     commentId = strUUID
                 }
 

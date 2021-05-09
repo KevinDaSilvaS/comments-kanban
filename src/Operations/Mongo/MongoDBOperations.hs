@@ -8,52 +8,99 @@ import Database.MongoDB
 import Control.Monad.Trans (liftIO)
 import Data.AesonBson
 import qualified BaseTypes.Comment as Com
+import LoadEnv
+import System.Environment (lookupEnv)
 --https://github.com/mongodb-haskell/mongodb/blob/master/doc/Example.hs
 --https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783286331/1/ch01lvl1sec19/using-mongodb-queries-in-haskell
 --https://github.com/mongodb-haskell/mongodb/blob/master/doc/tutorial.md
 
 insertComment body = do
-    pipe <- connect (host "127.0.0.1")
-    isAuthenticated <- access pipe master (T.pack "admin") (auth (T.pack "kevin") (T.pack "kevin"))
+    loadEnv
+    (Just mongoHost) <- lookupEnv "MONGO_HOST"
+    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
+    (Just username) <- lookupEnv "MONGO_USERNAME"
+    (Just password) <- lookupEnv "MONGO_PASSWORD"
+    let txtDbName = T.pack dbName
+    let txtUsername = T.pack username
+    let txtPassword = T.pack password
+
+    pipe <- connect (host mongoHost)
+    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        insertedCommentId <- access pipe master "admin" (insertCommentOperation body)
-        insertedComment <- access pipe master "admin" (findMongoOperation ["_id" =: insertedCommentId])
+        insertedCommentId <- access pipe master txtDbName (insertCommentOperation body)
+        insertedComment <- access pipe master txtDbName (findMongoOperation ["_id" =: insertedCommentId])
         return $ (aesonify . exclude ["_id"]) $ head insertedComment
     else
         error "Unable to connect to database"
 
 getAllComments taskId = do
-    pipe <- connect (host "127.0.0.1")
-    isAuthenticated <- access pipe master (T.pack "admin") (auth (T.pack "kevin") (T.pack "kevin"))
+    loadEnv
+    (Just mongoHost) <- lookupEnv "MONGO_HOST"
+    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
+    (Just username) <- lookupEnv "MONGO_USERNAME"
+    (Just password) <- lookupEnv "MONGO_PASSWORD"
+    let txtDbName = T.pack dbName
+    let txtUsername = T.pack username
+    let txtPassword = T.pack password
+
+    pipe <- connect (host mongoHost)
+    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        comments <- access pipe master "admin" (getAllCommentsOperation taskId)
+        comments <- access pipe master txtDbName (getAllCommentsOperation taskId)
         return $ map (aesonify . exclude ["_id"]) comments
     else
         error "Unable to connect to database"
 
 getComment taskId commentId = do
-    pipe <- connect (host "127.0.0.1")
-    isAuthenticated <- access pipe master (T.pack "admin") (auth (T.pack "kevin") (T.pack "kevin"))
+    loadEnv
+    (Just mongoHost) <- lookupEnv "MONGO_HOST"
+    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
+    (Just username) <- lookupEnv "MONGO_USERNAME"
+    (Just password) <- lookupEnv "MONGO_PASSWORD"
+    let txtDbName = T.pack dbName
+    let txtUsername = T.pack username
+    let txtPassword = T.pack password
+
+    pipe <- connect (host mongoHost)
+    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        comment <- access pipe master "admin" (getOneCommentOperation taskId commentId)
+        comment <- access pipe master txtDbName (getOneCommentOperation taskId commentId)
         return $(aesonify . exclude ["_id"]) $ head comment
     else
         error "Unable to connect to database"
 
 updateComment commentId content = do
-    pipe <- connect (host "127.0.0.1")
-    isAuthenticated <- access pipe master (T.pack "admin") (auth (T.pack "kevin") (T.pack "kevin"))
+    loadEnv
+    (Just mongoHost) <- lookupEnv "MONGO_HOST"
+    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
+    (Just username) <- lookupEnv "MONGO_USERNAME"
+    (Just password) <- lookupEnv "MONGO_PASSWORD"
+    let txtDbName = T.pack dbName
+    let txtUsername = T.pack username
+    let txtPassword = T.pack password
+
+    pipe <- connect (host mongoHost)
+    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        updatedComments <- access pipe master "admin" (updateCommentsOperation commentId content)
+        updatedComments <- access pipe master txtDbName (updateCommentsOperation commentId content)
         return ()
     else
         error "Unable to connect to database"
 
 deleteComment commentId = do
-    pipe <- connect (host "127.0.0.1")
-    isAuthenticated <- access pipe master (T.pack "admin") (auth (T.pack "kevin") (T.pack "kevin"))
+    loadEnv
+    (Just mongoHost) <- lookupEnv "MONGO_HOST"
+    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
+    (Just username) <- lookupEnv "MONGO_USERNAME"
+    (Just password) <- lookupEnv "MONGO_PASSWORD"
+    let txtDbName = T.pack dbName
+    let txtUsername = T.pack username
+    let txtPassword = T.pack password
+
+    pipe <- connect (host mongoHost)
+    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        deletedComments <- access pipe master "admin" (deleteCommentsOperation commentId)
+        deletedComments <- access pipe master txtDbName (deleteCommentsOperation commentId)
         return ()
     else
         error "Unable to connect to database"
