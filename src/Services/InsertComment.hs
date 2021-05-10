@@ -9,7 +9,8 @@ import Network.HTTP.Conduit
 
 import BaseTypes.SpockApi ( Api, ApiAction )
 import qualified BaseTypes.PostRequest as PR
-import BaseTypes.Comment
+import BaseTypes.Comment as CM
+import BaseTypes.TaskTypes as TT
 import Errors.ErrorMessages
 import Data.Maybe (isNothing)
 
@@ -37,26 +38,31 @@ insertComment = do
             let boardId = PR.boardId sanitizeBody
             let taskId = PR.taskId sanitizeBody
 
-            initReq <- liftIO $ parseRequest (url ++ boardId ++ taskId)
+            initReq <- liftIO $ parseRequest (url ++ "/" ++ boardId ++ "/" ++ taskId)
             let req = initReq { method = "GET" }
             response <- httpLBS req
-            let code = getResponseStatusCode response
+            let resCode = getResponseStatusCode response
 
-            if code == 200 then do
-                uuid <- liftIO nextUUID
-                let (Just sanitizedUUID) = uuid
-                let strUUID = toString sanitizedUUID
-
-                let comment = Comment {
-                    content   = PR.content sanitizeBody,
-                    taskId    = taskId,
-                    boardId   = boardId,
-                    commentId = strUUID
-                }
-
-                insertedComment <- liftIO $ MongoOperations.insertComment comment
-                setStatus status201 >> json insertedComment
-            else if code == 404 then
+            if resCode == 404 then do
                 setStatus status404 >> _BOARD_NOT_FOUND
-            else
+            else if resCode > 200 then do
                 setStatus status500 >> _INTERNAL_SERVER_ERROR
+            else do 
+                let jsonBody = getResponseBody response
+                let decodedBody = Aeson.decode jsonBody :: Maybe TT.Response
+                case decodedBody of
+                    Nothing -> do setStatus status404 >> _BOARD_NOT_FOUND
+                    Just _ -> do
+                        uuid <- liftIO nextUUID
+                        let (Just sanitizedUUID) = uuid
+                        let strUUID = toString sanitizedUUID
+
+                        let comment = CM.Comment {
+                            CM.content   = PR.content sanitizeBody,
+                            CM.taskId    = taskId,
+                            CM.boardId   = boardId,
+                            CM.commentId = strUUID
+                        }
+
+                        insertedComment <- liftIO $ MongoOperations.insertComment comment
+                        setStatus status201 >> json insertedComment
