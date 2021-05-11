@@ -27,12 +27,12 @@ source-repository head
 
 library
   exposed-modules:
-      Lib, 
       BaseTypes.Comment, 
       BaseTypes.BaseTypes,
       BaseTypes.PostRequest,
       BaseTypes.PatchRequest,
       BaseTypes.SpockApi,
+      BaseTypes.TaskTypes,
       Errors.ErrorResponse,
       Errors.ErrorMessages,
       Services.GetComment,
