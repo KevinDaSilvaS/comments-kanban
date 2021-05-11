@@ -11,8 +11,11 @@ import BaseTypes.SpockApi ( Api, ApiAction )
 import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
 
+import Response.Response as Res
+import Network.HTTP.Types
+
 getComment :: Api
 getComment = do
     get ("comments" <//> var <//> var) $ \taskId commentId -> do
         comment <- liftIO $ MongoOperations.getComment taskId commentId
-        json comment
+        Res.response (statusCode status200) comment

@@ -20,6 +20,7 @@ import Data.UUID.V1 ( nextUUID )
 import LoadEnv
 import System.Environment (lookupEnv)
 import Services.Integrations.MiniKanban.GetTaskInfo
+import Response.Response as Res
 
 insertComment :: Api
 insertComment = do
@@ -53,4 +54,4 @@ insertComment = do
                 }
 
                 insertedComment <- liftIO $ MongoOperations.insertComment comment
-                setStatus status201 >> json insertedComment
+                setStatus status201 >> Res.responseSimple (statusCode status201) insertedComment
