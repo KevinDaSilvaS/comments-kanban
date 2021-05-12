@@ -103,8 +103,10 @@ deleteComment commentId = do
     pipe <- connect (host mongoHost)
     isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        deletedComments <- access pipe master txtDbName (deleteCommentsOperation commentId)
-        return ()
+        deletedComments <- try $ access pipe master txtDbName (deleteCommentsOperation commentId) :: IO (Either SomeException ())
+        case deletedComments of
+            Left ex -> return $ Just ex
+            Right _ -> return Nothing
     else
         error "Unable to connect to database"
 
