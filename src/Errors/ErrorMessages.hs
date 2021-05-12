@@ -10,3 +10,5 @@ _INTERNAL_SERVER_ERROR = errorJson 500 (pack "Internal Server Error")
 _PARSING_POST_BODY = errorJson 400 (pack "Error parsing body request (request json body must contain the current fields: { content - String, taskId - Id from the task created in kanban service, boardId - Id from the board created in kanban service })")
 
 _PARSING_PATCH_BODY = errorJson 400 (pack "Error parsing body request ( probably the body is empty or dont have valid fields, the updatable fields for patch route are: {content - String}")
+
+_ERROR_UPDATING_COMMENT = errorJson 400 (pack "Error Updating comment.(Check existence of comment)")
