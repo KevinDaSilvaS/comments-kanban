@@ -12,3 +12,5 @@ _PARSING_POST_BODY = errorJson 400 (pack "Error parsing body request (request js
 _PARSING_PATCH_BODY = errorJson 400 (pack "Error parsing body request ( probably the body is empty or dont have valid fields, the updatable fields for patch route are: {content - String}")
 
 _ERROR_UPDATING_COMMENT = errorJson 400 (pack "Error Updating comment.(Check existence of comment)")
+
+_ERROR_DELETING_COMMENT = errorJson 400 (pack "Error deleting comment.(Check existence of comment)")
