@@ -61,7 +61,6 @@ library
       , AesonBson
       , uuid
       , load-env
-      , unliftio
   default-language: Haskell2010
 
 executable comments-kanban-exe
@@ -89,7 +88,6 @@ executable comments-kanban-exe
     , AesonBson
     , uuid
     , load-env
-    , unliftio
   default-language: Haskell2010
 
 test-suite comments-kanban-test
