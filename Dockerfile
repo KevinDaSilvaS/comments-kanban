@@ -6,10 +6,6 @@ RUN stack setup
 
 RUN stack build
 
-WORKDIR ./
-
-COPY . .
-
 FROM debian
 
 RUN apt update
