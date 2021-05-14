@@ -10,6 +10,7 @@ import Data.AesonBson
 import qualified BaseTypes.Comment as Com
 import LoadEnv
 import System.Environment (lookupEnv)
+import Control.Exception 
 --https://github.com/mongodb-haskell/mongodb/blob/master/doc/Example.hs
 --https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783286331/1/ch01lvl1sec19/using-mongodb-queries-in-haskell
 --https://github.com/mongodb-haskell/mongodb/blob/master/doc/tutorial.md
@@ -82,8 +83,10 @@ updateComment commentId content = do
     pipe <- connect (host mongoHost)
     isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        updatedComments <- access pipe master txtDbName (updateCommentsOperation commentId content)
-        return ()
+        updatedComments <- try (access pipe master txtDbName (updateCommentsOperation commentId content)) :: IO (Either SomeException ())
+        case updatedComments of
+            Left ex -> return $ Just ex
+            Right _ -> return Nothing
     else
         error "Unable to connect to database"
 
@@ -100,10 +103,16 @@ deleteComment commentId = do
     pipe <- connect (host mongoHost)
     isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        deletedComments <- access pipe master txtDbName (deleteCommentsOperation commentId)
-        return ()
+        deletedComments <- try $ access pipe master txtDbName (deleteCommentsOperation commentId) :: IO (Either SomeException ())
+        case deletedComments of
+            Left ex -> return $ Just ex
+            Right _ -> return Nothing
     else
         error "Unable to connect to database"
+
+writeFailureErrorStr :: Failure -> Maybe Int
+writeFailureErrorStr (WriteFailure _err str "") = Just str
+writeFailureErrorStr _other = Nothing
     
 findMongoOperation :: Selector -> Action IO [Document]
 findMongoOperation query = do rest =<< find (select query "comments") {sort = []}
