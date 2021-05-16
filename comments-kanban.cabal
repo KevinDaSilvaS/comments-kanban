@@ -33,6 +33,7 @@ library
       BaseTypes.PatchRequest,
       BaseTypes.SpockApi,
       BaseTypes.TaskTypes,
+      BaseTypes.MessageTypes,
       Errors.ErrorResponse,
       Errors.ErrorMessages,
       Services.GetComment,
@@ -43,7 +44,10 @@ library
       Services.DeleteAllComments,
       Services.Integrations.MiniKanban.GetTaskInfo
       Operations.Mongo.MongoDBOperations,
-      Operations.RabbitMq.CommentsConsumer,
+      Operations.RabbitMq.ConnectBroker,
+      Operations.RabbitMq.Queues,
+      Operations.RabbitMq.Callbacks,
+      Operations.RabbitMq.StartQueue,
       Response.Response
   other-modules:
       Paths_comments_kanban

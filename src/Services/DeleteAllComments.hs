@@ -7,4 +7,4 @@ import Control.Monad.Trans (liftIO)
 
 deleteAllComments taskId = do
     liftIO $ MongoOperations.deleteComment taskId
-    putStrLn $ "Processed" ++ taskId
+    putStrLn $ "Processed " ++ taskId

@@ -15,7 +15,7 @@ import Services.UpdateComment  ( updateComment )
 
 import Network.Wai.Middleware.Cors
 
-import Operations.RabbitMq.CommentsConsumer
+import Operations.RabbitMq.ConnectBroker
 
 main :: IO ()
 main = do
