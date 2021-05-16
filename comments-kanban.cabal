@@ -33,6 +33,7 @@ library
       BaseTypes.PatchRequest,
       BaseTypes.SpockApi,
       BaseTypes.TaskTypes,
+      BaseTypes.MessageTypes,
       Errors.ErrorResponse,
       Errors.ErrorMessages,
       Services.GetComment,
@@ -40,8 +41,13 @@ library
       Services.InsertComment,
       Services.DeleteComment,
       Services.UpdateComment,
+      Services.DeleteAllComments,
       Services.Integrations.MiniKanban.GetTaskInfo
       Operations.Mongo.MongoDBOperations,
+      Operations.RabbitMq.ConnectBroker,
+      Operations.RabbitMq.Queues,
+      Operations.RabbitMq.Callbacks,
+      Operations.RabbitMq.StartQueue,
       Response.Response
   other-modules:
       Paths_comments_kanban
@@ -61,6 +67,7 @@ library
       , AesonBson
       , uuid
       , load-env
+      , amqp
   default-language: Haskell2010
 
 executable comments-kanban-exe
@@ -88,6 +95,7 @@ executable comments-kanban-exe
     , AesonBson
     , uuid
     , load-env
+    , amqp
   default-language: Haskell2010
 
 test-suite comments-kanban-test

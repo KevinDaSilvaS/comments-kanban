@@ -24,11 +24,4 @@ networks:
     comments_app:
         driver: bridge
         name: comments_app 
-        # if your are not using kanban gateway to deploy the application
-        # just comment all the kanban network references in this docker-compose file ..
-        #kanban:
-            #driver: overlay
-            #name: kanban 
-                #external: 
-                #name: kanban
             

@@ -15,8 +15,11 @@ import Services.UpdateComment  ( updateComment )
 
 import Network.Wai.Middleware.Cors
 
+import Operations.RabbitMq.ConnectBroker
+
 main :: IO ()
 main = do
+    connectBroker
     spockCfg <- defaultSpockCfg () PCNoDatabase ()
     runSpock 8835 (spock spockCfg app)
 
