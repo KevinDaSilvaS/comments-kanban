@@ -12,6 +12,15 @@ services:
         networks:
             - comments_app
 
+    rabbit-mq:
+        image: rabbitmq:3-management
+        hostname: ${HOSTNAME}
+        ports: 
+            - "${RABBITMQ_FST_PORT}:15672"
+            - "${RABBITMQ_SND_PORT}:5672"
+        networks:
+            - comments_app
+
     docs:
         image: comments_docs
         build: 
