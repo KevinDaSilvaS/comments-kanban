@@ -13,7 +13,7 @@ services:
             - comments_app
 
     comments:
-        image: comments-app
+        image: comments
         environment: 
             - MONGO_USERNAME=${MONGO_USERNAME}
             - MONGO_PASSWORD=${MONGO_PASSWORD}

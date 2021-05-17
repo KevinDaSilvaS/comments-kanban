@@ -5,3 +5,4 @@ Dockerfile
 .dockerignore
 .stack-work
 .env
+node_modules
