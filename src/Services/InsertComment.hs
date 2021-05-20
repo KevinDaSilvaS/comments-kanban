@@ -28,10 +28,6 @@ insertComment = do
         if isNothing body then
             setStatus status400 >> _PARSING_POST_BODY
         else do
-            let (Just sanitizeBody) = body
-            let boardId = PR.boardId sanitizeBody
-            let taskId = PR.taskId sanitizeBody
-
             taskIntegration <- liftIO $ getTaskInfo body
 
             if fst taskIntegration >= 500 then do
@@ -41,12 +37,13 @@ insertComment = do
                 setStatus status404 >> _BOARD_NOT_FOUND
 
             else do 
+                let (Just sanitizeBody) = body
                 uuid <- liftIO generateUUID
 
                 let comment = CM.Comment {
                     CM.content   = PR.content sanitizeBody,
-                    CM.taskId    = taskId,
-                    CM.boardId   = boardId,
+                    CM.taskId    = PR.taskId sanitizeBody,
+                    CM.boardId   = PR.boardId sanitizeBody,
                     CM.commentId = uuid
                 }
 
