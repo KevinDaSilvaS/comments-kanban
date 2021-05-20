@@ -19,7 +19,8 @@ updateComment = do
         case body of
             Nothing -> setStatus status400 >> _PARSING_PATCH_BODY
             Just patchPayload -> do 
-                comment <- liftIO $ MongoOperations.updateComment commentId (PATCHR.content patchPayload)
+                comment <- liftIO $ MongoOperations.updateComment 
+                    commentId (PATCHR.content patchPayload)
                 case comment of
                     Nothing -> setStatus noContent204
                     Just _  -> setStatus status400 >> _ERROR_UPDATING_COMMENT

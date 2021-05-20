@@ -54,4 +54,5 @@ insertComment = do
                 }
 
                 insertedComment <- liftIO $ MongoOperations.insertComment comment
-                setStatus status201 >> Res.responseSimple (statusCode status201) insertedComment
+                setStatus status201 >> Res.responseSimple 
+                    (statusCode status201) insertedComment
