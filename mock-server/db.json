@@ -1,5 +1,11 @@
 {
     "tasks": [
-      { "board": 1, "taskId":1, "title": "json-server", "author": "typicode" }
+      { "boardId": 1, 
+        "taskId":1, 
+        "response": {
+          "code": "json-server", 
+          "details": "typicode"
+        } 
+      }
     ]
 }
