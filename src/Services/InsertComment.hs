@@ -14,13 +14,12 @@ import Data.Maybe (isNothing)
 import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
 
-import Data.UUID
-import Data.UUID.V1 ( nextUUID )
-
 import LoadEnv
 import System.Environment (lookupEnv)
 import Services.Integrations.MiniKanban.GetTaskInfo
 import Response.Response as Res
+
+import Helpers.GenerateUUID
 
 insertComment :: Api
 insertComment = do
@@ -42,15 +41,13 @@ insertComment = do
                 setStatus status404 >> _BOARD_NOT_FOUND
 
             else do 
-                uuid <- liftIO nextUUID
-                let (Just sanitizedUUID) = uuid
-                let strUUID = toString sanitizedUUID
+                uuid <- liftIO generateUUID
 
                 let comment = CM.Comment {
                     CM.content   = PR.content sanitizeBody,
                     CM.taskId    = taskId,
                     CM.boardId   = boardId,
-                    CM.commentId = strUUID
+                    CM.commentId = uuid
                 }
 
                 insertedComment <- liftIO $ MongoOperations.insertComment comment
