@@ -12,6 +12,15 @@ services:
         networks:
             - comments_app
 
+    rabbit-mq:
+        image: rabbitmq:3-management
+        hostname: ${HOSTNAME}
+        ports: 
+            - "${RABBITMQ_FST_PORT}:15672"
+            - "${RABBITMQ_SND_PORT}:5672"
+        networks:
+            - comments_app
+
     docs:
         image: comments_docs
         build: 
@@ -24,11 +33,4 @@ networks:
     comments_app:
         driver: bridge
         name: comments_app 
-        # if your are not using kanban gateway to deploy the application
-        # just comment all the kanban network references in this docker-compose file ..
-        #kanban:
-            #driver: overlay
-            #name: kanban 
-                #external: 
-                #name: kanban
             

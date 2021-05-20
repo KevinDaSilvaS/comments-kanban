@@ -20,6 +20,9 @@ services:
             - MONGO_DB_NAME=${MONGO_DB_NAME}
             - MONGO_HOST=mongo
             - CHECK_TASK_URL=${CHECK_TASK_URL}
+            - RABBIT_HOST=eg-gateway_rabbit-mq_1
+            - RABBIT_USERNAME=${RABBIT_USERNAME}
+            - RABBIT_PASSWORD=${RABBIT_PASSWORD}
         build: 
             context: .
         ports: 
@@ -27,7 +30,7 @@ services:
         links:
             - mongo
         networks:
-            #- kanban
+            - kanban
             - comments_app
 
     docs:
@@ -44,9 +47,8 @@ networks:
         name: comments_app 
         # if your are not using kanban gateway to deploy the application
         # just comment all the kanban network references in this docker-compose file ..
-        #kanban:
-            #driver: overlay
-            #name: kanban 
-                #external: 
-                #name: kanban
+    kanban:
+        driver: overlay
+        external: 
+            name: eg-gateway_kanban
             
