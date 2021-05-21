@@ -30,23 +30,23 @@ insertComment = do
         else do
             taskIntegration <- liftIO $ getTaskInfo body
 
-            if fst taskIntegration >= 500 then do
-                setStatus status500 >> _INTERNAL_SERVER_ERROR
+            case taskIntegration of
+                200 -> do
+                    let (Just sanitizeBody) = body
+                    uuid <- liftIO generateUUID
 
-            else if snd taskIntegration == 404 then do
-                setStatus status404 >> _BOARD_NOT_FOUND
+                    let comment = CM.Comment {
+                        CM.content   = PR.content sanitizeBody,
+                        CM.taskId    = PR.taskId sanitizeBody,
+                        CM.boardId   = PR.boardId sanitizeBody,
+                        CM.commentId = uuid
+                    }
 
-            else do 
-                let (Just sanitizeBody) = body
-                uuid <- liftIO generateUUID
+                    insertedComment <- liftIO $ 
+                        MongoOperations.insertComment comment
 
-                let comment = CM.Comment {
-                    CM.content   = PR.content sanitizeBody,
-                    CM.taskId    = PR.taskId sanitizeBody,
-                    CM.boardId   = PR.boardId sanitizeBody,
-                    CM.commentId = uuid
-                }
+                    setStatus status201 >> Res.responseSimple 
+                        (statusCode status201) insertedComment
 
-                insertedComment <- liftIO $ MongoOperations.insertComment comment
-                setStatus status201 >> Res.responseSimple 
-                    (statusCode status201) insertedComment
+                404 -> do setStatus status404 >> _TASK_NOT_FOUND
+                _   -> do setStatus status400 >> _ERROR_SEARCHING_TASK

@@ -6,9 +6,7 @@ import Network.HTTP.Simple
 import Network.HTTP.Conduit
 
 import qualified BaseTypes.PostRequest as PR
-import BaseTypes.TaskTypes as TT
 
-import qualified Data.Aeson as Aeson
 import Control.Monad.Trans (liftIO)
 
 import LoadEnv
@@ -27,9 +25,5 @@ getTaskInfo body = do
     response <- httpLBS req
 
     let resCode = getResponseStatusCode response
-    let jsonBody = getResponseBody response
-    let decodedBody = Aeson.decode jsonBody :: Maybe TT.Response
 
-    case decodedBody of
-        Nothing -> do return (resCode, 404)
-        Just responseData -> do return (resCode, code responseData)
+    return resCode
