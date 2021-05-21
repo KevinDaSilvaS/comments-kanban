@@ -14,13 +14,12 @@ import Data.Maybe (isNothing)
 import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
 
-import Data.UUID
-import Data.UUID.V1 ( nextUUID )
-
 import LoadEnv
 import System.Environment (lookupEnv)
 import Services.Integrations.MiniKanban.GetTaskInfo
 import Response.Response as Res
+
+import Helpers.GenerateUUID
 
 insertComment :: Api
 insertComment = do
@@ -29,10 +28,6 @@ insertComment = do
         if isNothing body then
             setStatus status400 >> _PARSING_POST_BODY
         else do
-            let (Just sanitizeBody) = body
-            let boardId = PR.boardId sanitizeBody
-            let taskId = PR.taskId sanitizeBody
-
             taskIntegration <- liftIO $ getTaskInfo body
 
             if fst taskIntegration >= 500 then do
@@ -42,16 +37,16 @@ insertComment = do
                 setStatus status404 >> _BOARD_NOT_FOUND
 
             else do 
-                uuid <- liftIO nextUUID
-                let (Just sanitizedUUID) = uuid
-                let strUUID = toString sanitizedUUID
+                let (Just sanitizeBody) = body
+                uuid <- liftIO generateUUID
 
                 let comment = CM.Comment {
                     CM.content   = PR.content sanitizeBody,
-                    CM.taskId    = taskId,
-                    CM.boardId   = boardId,
-                    CM.commentId = strUUID
+                    CM.taskId    = PR.taskId sanitizeBody,
+                    CM.boardId   = PR.boardId sanitizeBody,
+                    CM.commentId = uuid
                 }
 
                 insertedComment <- liftIO $ MongoOperations.insertComment comment
-                setStatus status201 >> Res.responseSimple (statusCode status201) insertedComment
+                setStatus status201 >> Res.responseSimple 
+                    (statusCode status201) insertedComment

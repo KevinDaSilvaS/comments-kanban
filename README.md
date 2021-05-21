@@ -21,7 +21,7 @@ P.S this part might take a while, due to haskell being a compiled language.
 <p>To access the documentation</p>
 
 ```
-http://localhost:5000/
+http://localhost:5001/
 ```
 
 [Link to access the mini-kanban repository](https://github.com/KevinDaSilvaS/Mini-Kanban "mini-kanban repository")
