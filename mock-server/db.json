@@ -1,10 +1,11 @@
 {
     "tasks": [
-      { "boardId": 1, 
-        "taskId":1, 
-        "response": {
-          "code": "json-server", 
-          "details": "typicode"
+      { 
+        "code": 200, 
+        "details": {
+          "boardId": "12s4f352j82sA8bB677",
+          "title": "String",
+          "description": "Maybe String"
         } 
       }
     ]
