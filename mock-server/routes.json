@@ -1,0 +1,3 @@
+{
+    "/tasks/:boardId/:taskId": "/tasks?id=:boardId/:taskId"
+}

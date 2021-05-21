@@ -1,3 +1,4 @@
 .stack-work/
 *~
 Lib.hs
+node_modules
