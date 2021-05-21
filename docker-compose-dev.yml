@@ -35,7 +35,7 @@ services:
         build: 
             context: ./mock-server
         ports:
-            - "3000:3000"
+            - "1747:3000"
         networks: 
             - comments_app
 networks:
