@@ -1,12 +1,14 @@
 {
     "tasks": [
-      { 
-        "code": 200, 
-        "details": {
-          "boardId": "12s4f352j82sA8bB677",
-          "title": "String",
-          "description": "Maybe String"
-        } 
+      {
+        "12s4f352j82sA8bB677/12s4f352j82sA8bB677":{ 
+          "code": 200, 
+          "details": {
+            "boardId": "12s4f352j82sA8bB677",
+            "title": "String",
+            "description": "Maybe String"
+          } 
+        }
       }
     ]
 }
