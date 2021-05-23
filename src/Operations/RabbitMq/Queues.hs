@@ -1,12 +1,12 @@
 module Operations.RabbitMq.Queues where
 
 import Operations.RabbitMq.Callbacks
-    ( callbackCommentsWhenTaskIsDeleted )
+    ( callbackCommentsWhenTaskOrBoardIsDeleted )
    
 import Network.AMQP ( Envelope, Message ) 
 
 queuesList :: [(String, (Message, Envelope) -> IO ())]
 queuesList = [
-    ("comments-service-delete-all-comments-when-task-is-deleted",
-    callbackCommentsWhenTaskIsDeleted)
+    ("comments-service-delete-all-comments-when-task-or-board-is-deleted",
+    callbackCommentsWhenTaskOrBoardIsDeleted)
     ]
