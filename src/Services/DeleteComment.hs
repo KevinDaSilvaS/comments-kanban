@@ -14,7 +14,7 @@ import Errors.ErrorMessages
 deleteComment :: Api
 deleteComment = do
     delete ("comments" <//> var) $ \commentId -> do
-        comment <- liftIO $ MongoOperations.deleteComment commentId
+        comment <- liftIO $ MongoOperations.deleteComment "commentId" commentId
         case comment of
             Nothing -> setStatus noContent204
             Just _  -> setStatus status400 >> _ERROR_DELETING_COMMENT
