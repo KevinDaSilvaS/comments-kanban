@@ -9,6 +9,7 @@ import Control.Monad.Trans (liftIO)
 import Data.AesonBson
 import qualified BaseTypes.Comment as Com
 import LoadEnv
+import Data.Aeson (Object)
 import System.Environment (lookupEnv)
 import Control.Exception 
 --https://github.com/mongodb-haskell/mongodb/blob/master/doc/Example.hs
@@ -31,11 +32,12 @@ insertComment body = do
         insertedCommentId <- access pipe master txtDbName 
             (insertCommentOperation body)
         insertedComment <- access pipe master txtDbName 
-            (findMongoOperation ["_id" =: insertedCommentId])
+            (findComments ["_id" =: insertedCommentId])
         return $ (aesonify . exclude ["_id"]) $ head insertedComment
     else
         error "Unable to connect to database"
 
+getAllComments :: String -> IO [Object]
 getAllComments taskId = do
     loadEnv
     (Just mongoHost) <- lookupEnv "MONGO_HOST"
@@ -49,11 +51,13 @@ getAllComments taskId = do
     pipe <- connect (host mongoHost)
     isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
-        comments <- access pipe master txtDbName (getAllCommentsOperation taskId)
+        comments <- access pipe master txtDbName (findComments 
+            ["taskId" =: taskId])
         return $ map (aesonify . exclude ["_id"]) comments
     else
         error "Unable to connect to database"
 
+getComment :: String -> String -> IO [Object]
 getComment taskId commentId = do
     loadEnv
     (Just mongoHost) <- lookupEnv "MONGO_HOST"
@@ -68,7 +72,9 @@ getComment taskId commentId = do
     isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
     if isAuthenticated then do
         comment <- access pipe master txtDbName 
-            (getOneCommentOperation taskId commentId)
+            (findComments [
+                "taskId" =: taskId, "commentId" =: commentId
+                ])
         return $ map (aesonify . exclude ["_id"]) comment
     else
         error "Unable to connect to database"
@@ -96,7 +102,7 @@ updateComment commentId content = do
     else
         error "Unable to connect to database"
 
-deleteComment commentId = do
+deleteComment field value = do
     loadEnv
     (Just mongoHost) <- lookupEnv "MONGO_HOST"
     (Just dbName) <- lookupEnv "MONGO_DB_NAME"
@@ -111,52 +117,17 @@ deleteComment commentId = do
     if isAuthenticated then do
         deletedComments <- try $ 
             access pipe master txtDbName 
-            (deleteCommentsOperation commentId) :: IO (Either SomeException ())
+            (deleteCommentsOperation 
+            (T.pack field) value) :: IO (Either SomeException ())
         case deletedComments of
             Left ex -> return $ Just ex
             Right _ -> return Nothing
     else
         error "Unable to connect to database"
-
-deleteAllComments taskId = do
-    loadEnv
-    (Just mongoHost) <- lookupEnv "MONGO_HOST"
-    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
-    (Just username) <- lookupEnv "MONGO_USERNAME"
-    (Just password) <- lookupEnv "MONGO_PASSWORD"
-    let txtDbName = T.pack dbName
-    let txtUsername = T.pack username
-    let txtPassword = T.pack password
-
-    pipe <- connect (host mongoHost)
-    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
-    if isAuthenticated then do
-        deletedComments <- try $ 
-            access pipe master txtDbName 
-            (deleteAllCommentsOperation taskId) :: IO (Either SomeException ())
-        case deletedComments of
-            Left ex -> return $ Just ex
-            Right _ -> return Nothing
-    else
-        error "Unable to connect to database"
-
-writeFailureErrorStr :: Failure -> Maybe Int
-writeFailureErrorStr (WriteFailure _err str "") = Just str
-writeFailureErrorStr _other = Nothing
     
-findMongoOperation :: Selector -> Action IO [Document]
-findMongoOperation query = do 
+findComments :: Selector -> Action IO [Document]
+findComments query = do 
     rest =<< find (select query "comments") {sort = []}
-
-getAllCommentsOperation :: String -> Action IO [Document]
-getAllCommentsOperation taskId = do 
-    rest =<< find (select ["taskId" =: taskId] "comments") {sort = []}
-    
-getOneCommentOperation :: String -> String -> Action IO [Document]
-getOneCommentOperation taskId commentId = do 
-    rest =<< find (select [
-        "taskId" =: taskId, "commentId" =: commentId
-        ] "comments") {sort = []}
 
 insertCommentOperation :: Com.Comment -> Action IO Value
 insertCommentOperation Com.Comment {
@@ -173,10 +144,6 @@ updateCommentsOperation commentId content = fetch (select [
     "commentId" =: commentId] "comments") >>= save "comments" . merge [
         "content" =: content]
 
-deleteCommentsOperation :: String -> Action IO ()
-deleteCommentsOperation commentId = delete (select [
-    "commentId" =: commentId] "comments")
-
-deleteAllCommentsOperation :: String -> Action IO ()
-deleteAllCommentsOperation taskId = delete (select [
-    "taskId" =: taskId] "comments")
+deleteCommentsOperation :: T.Text -> String -> Action IO ()
+deleteCommentsOperation field value = delete (select [
+    field =: value] "comments")
