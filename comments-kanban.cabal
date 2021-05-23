@@ -48,7 +48,8 @@ library
       Operations.RabbitMq.Queues,
       Operations.RabbitMq.Callbacks,
       Operations.RabbitMq.StartQueue,
-      Response.Response
+      Response.Response,
+      Helpers.GenerateUUID
   other-modules:
       Paths_comments_kanban
   hs-source-dirs:
