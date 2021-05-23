@@ -13,3 +13,11 @@ newtype BodyWhenTaskIsDeletedConsumer =
 instance ToJSON BodyWhenTaskIsDeletedConsumer
     
 instance FromJSON BodyWhenTaskIsDeletedConsumer
+
+newtype BodyWhenBoardIsDeletedConsumer = 
+    BodyWhenBoardIsDeletedConsumer { 
+        boardId :: BoardId } deriving (Generic, Show)
+    
+instance ToJSON BodyWhenBoardIsDeletedConsumer
+    
+instance FromJSON BodyWhenBoardIsDeletedConsumer
