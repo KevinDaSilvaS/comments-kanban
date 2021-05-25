@@ -4,7 +4,9 @@ module Services.DeleteAllComments where
 
 import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
+import Operations.Mongo.ConnectionMongoDB
 
 deleteAllComments field value = do
-    liftIO $ MongoOperations.deleteComment field value
+    conn <- liftIO connection
+    liftIO $ MongoOperations.deleteComment conn field value
     putStrLn $ "Processed " ++ value

@@ -20,9 +20,10 @@ import Services.Integrations.MiniKanban.GetTaskInfo
 import Response.Response as Res
 
 import Helpers.GenerateUUID
+import Database.MongoDB ( Pipe, Database )
 
-insertComment :: Api
-insertComment = do
+insertComment :: (Pipe, Database) -> Api
+insertComment connection = do
     post "comments" $ do
         body <- jsonBody :: ApiAction (Maybe PR.PostCommentRequest)
         if isNothing body then
@@ -43,7 +44,7 @@ insertComment = do
                     }
 
                     insertedComment <- liftIO $ 
-                        MongoOperations.insertComment comment
+                        MongoOperations.insertComment connection comment
 
                     setStatus status201 >> Res.responseSimple 
                         (statusCode status201) insertedComment

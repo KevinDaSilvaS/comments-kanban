@@ -14,11 +14,13 @@ import Control.Monad.Trans (liftIO)
 import Response.Response as Res
 import Network.HTTP.Types
 import Errors.ErrorMessages
+import Database.MongoDB ( Pipe, Database )
 
-getComment :: Api
-getComment = do
+getComment :: (Pipe, Database) -> Api
+getComment connection = do
     get ("comments" <//> var <//> var) $ \taskId commentId -> do
-        comment <- liftIO $ MongoOperations.getComment taskId commentId
+        comment <- liftIO $ MongoOperations.getComment 
+            connection taskId commentId
         if null comment then
             setStatus status404 >> _COMMENT_NOT_FOUND
         else

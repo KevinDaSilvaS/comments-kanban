@@ -8,13 +8,15 @@ import Network.HTTP.Types
 import BaseTypes.SpockApi ( Api, ApiAction )
 import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
+import Database.MongoDB ( Pipe, Database )
 
 import Errors.ErrorMessages
 
-deleteComment :: Api
-deleteComment = do
+deleteComment :: (Pipe, Database) -> Api
+deleteComment connection = do
     delete ("comments" <//> var) $ \commentId -> do
-        comment <- liftIO $ MongoOperations.deleteComment "commentId" commentId
+        comment <- liftIO $ MongoOperations.deleteComment 
+            connection "commentId" commentId
         case comment of
             Nothing -> setStatus noContent204
             Just _  -> setStatus status400 >> _ERROR_DELETING_COMMENT
