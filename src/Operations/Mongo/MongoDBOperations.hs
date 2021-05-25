@@ -16,117 +16,52 @@ import Control.Exception
 --https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783286331/1/ch01lvl1sec19/using-mongodb-queries-in-haskell
 --https://github.com/mongodb-haskell/mongodb/blob/master/doc/tutorial.md
 
-insertComment body = do
-    loadEnv
-    (Just mongoHost) <- lookupEnv "MONGO_HOST"
-    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
-    (Just username) <- lookupEnv "MONGO_USERNAME"
-    (Just password) <- lookupEnv "MONGO_PASSWORD"
-    let txtDbName = T.pack dbName
-    let txtUsername = T.pack username
-    let txtPassword = T.pack password
+insertComment :: (Pipe, Database) -> Com.Comment -> IO Object
+insertComment (pipe, dbName) body = do
+    insertedCommentId <- access pipe master dbName 
+        (insertCommentOperation body)
+    insertedComment <- access pipe master dbName 
+        (findCommentsOperation ["_id" =: insertedCommentId])
+    return $ (aesonify . exclude ["_id"]) $ head insertedComment
 
-    pipe <- connect (host mongoHost)
-    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
-    if isAuthenticated then do
-        insertedCommentId <- access pipe master txtDbName 
-            (insertCommentOperation body)
-        insertedComment <- access pipe master txtDbName 
-            (findComments ["_id" =: insertedCommentId])
-        return $ (aesonify . exclude ["_id"]) $ head insertedComment
-    else
-        error "Unable to connect to database"
+getAllComments :: (Pipe, Database) -> String -> IO [Object]
+getAllComments (pipe, dbName) taskId = do
+    comments <- access pipe master dbName (findCommentsOperation 
+        ["taskId" =: taskId])
+    return $ map (aesonify . exclude ["_id"]) comments
 
-getAllComments :: String -> IO [Object]
-getAllComments taskId = do
-    loadEnv
-    (Just mongoHost) <- lookupEnv "MONGO_HOST"
-    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
-    (Just username) <- lookupEnv "MONGO_USERNAME"
-    (Just password) <- lookupEnv "MONGO_PASSWORD"
-    let txtDbName = T.pack dbName
-    let txtUsername = T.pack username
-    let txtPassword = T.pack password
+getComment :: (Pipe, Database) -> String -> String -> IO [Object]
+getComment (pipe, dbName) taskId commentId = do
+    comment <- access pipe master dbName 
+        (findCommentsOperation [
+            "taskId" =: taskId, "commentId" =: commentId
+            ])
+    return $ map (aesonify . exclude ["_id"]) comment
 
-    pipe <- connect (host mongoHost)
-    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
-    if isAuthenticated then do
-        comments <- access pipe master txtDbName (findComments 
-            ["taskId" =: taskId])
-        return $ map (aesonify . exclude ["_id"]) comments
-    else
-        error "Unable to connect to database"
+updateComment :: (Pipe, Database) -> String -> String -> IO (Maybe SomeException)
+updateComment (pipe, dbName) commentId content = do
+    updatedComments <- try 
+        (access pipe master dbName 
+        (updateCommentsOperation commentId content)) 
+        :: IO (Either SomeException ())
+        
+    case updatedComments of
+        Left ex -> return $ Just ex
+        Right _ -> return Nothing
 
-getComment :: String -> String -> IO [Object]
-getComment taskId commentId = do
-    loadEnv
-    (Just mongoHost) <- lookupEnv "MONGO_HOST"
-    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
-    (Just username) <- lookupEnv "MONGO_USERNAME"
-    (Just password) <- lookupEnv "MONGO_PASSWORD"
-    let txtDbName = T.pack dbName
-    let txtUsername = T.pack username
-    let txtPassword = T.pack password
+deleteComment :: (Pipe, Database) -> String -> String -> IO (Maybe SomeException)
+deleteComment (pipe, dbName) field value = do
 
-    pipe <- connect (host mongoHost)
-    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
-    if isAuthenticated then do
-        comment <- access pipe master txtDbName 
-            (findComments [
-                "taskId" =: taskId, "commentId" =: commentId
-                ])
-        return $ map (aesonify . exclude ["_id"]) comment
-    else
-        error "Unable to connect to database"
-
-updateComment commentId content = do
-    loadEnv
-    (Just mongoHost) <- lookupEnv "MONGO_HOST"
-    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
-    (Just username) <- lookupEnv "MONGO_USERNAME"
-    (Just password) <- lookupEnv "MONGO_PASSWORD"
-    let txtDbName = T.pack dbName
-    let txtUsername = T.pack username
-    let txtPassword = T.pack password
-
-    pipe <- connect (host mongoHost)
-    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
-    if isAuthenticated then do
-        updatedComments <- try 
-            (access pipe master txtDbName 
-            (updateCommentsOperation commentId content)) 
-            :: IO (Either SomeException ())
-        case updatedComments of
-            Left ex -> return $ Just ex
-            Right _ -> return Nothing
-    else
-        error "Unable to connect to database"
-
-deleteComment field value = do
-    loadEnv
-    (Just mongoHost) <- lookupEnv "MONGO_HOST"
-    (Just dbName) <- lookupEnv "MONGO_DB_NAME"
-    (Just username) <- lookupEnv "MONGO_USERNAME"
-    (Just password) <- lookupEnv "MONGO_PASSWORD"
-    let txtDbName = T.pack dbName
-    let txtUsername = T.pack username
-    let txtPassword = T.pack password
-
-    pipe <- connect (host mongoHost)
-    isAuthenticated <- access pipe master txtDbName (auth txtUsername txtPassword)
-    if isAuthenticated then do
-        deletedComments <- try $ 
-            access pipe master txtDbName 
-            (deleteCommentsOperation 
-            (T.pack field) value) :: IO (Either SomeException ())
-        case deletedComments of
-            Left ex -> return $ Just ex
-            Right _ -> return Nothing
-    else
-        error "Unable to connect to database"
+    deletedComments <- try $ 
+        access pipe master dbName 
+        (deleteCommentsOperation 
+        (T.pack field) value) :: IO (Either SomeException ())
+    case deletedComments of
+        Left ex -> return $ Just ex
+        Right _ -> return Nothing
     
-findComments :: Selector -> Action IO [Document]
-findComments query = do 
+findCommentsOperation :: Selector -> Action IO [Document]
+findCommentsOperation query = do 
     rest =<< find (select query "comments") {sort = []}
 
 insertCommentOperation :: Com.Comment -> Action IO Value
