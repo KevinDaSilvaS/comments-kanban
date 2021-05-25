@@ -16,6 +16,8 @@ import Services.UpdateComment  ( updateComment )
 import Network.Wai.Middleware.Cors
 
 import Operations.RabbitMq.ConnectBroker
+import Operations.Mongo.ConnectionMongoDB
+import Control.Monad.Trans (liftIO)
 
 main :: IO ()
 main = do
@@ -25,14 +27,15 @@ main = do
 
 app :: Api
 app = do
+    conn <- liftIO connection
     middleware simpleCors
     
-    getComment
+    getComment conn
 
-    getAllComments
+    getAllComments conn
 
-    deleteComment
+    deleteComment conn
 
-    insertComment
+    insertComment conn
 
-    updateComment
+    updateComment conn
