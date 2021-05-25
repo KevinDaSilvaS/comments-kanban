@@ -3,7 +3,7 @@ module Operations.RabbitMq.StartQueue where
 import Network.AMQP
 import Data.Text (pack)
 
-startQueue conn queueInfo = do
+startQueue conn connMongo queueInfo = do
 
     let queueName = fst queueInfo
     let queueCallback = snd queueInfo
@@ -15,4 +15,4 @@ startQueue conn queueInfo = do
         exchangeType = pack "topic"}
     bindQueue chan (pack queueName) (pack "topic-Mini-Kanban") (pack "com.*")
     
-    consumeMsgs chan (pack queueName) Ack queueCallback
+    consumeMsgs chan (pack queueName) Ack (queueCallback connMongo)
