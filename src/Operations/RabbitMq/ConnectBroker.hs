@@ -13,6 +13,9 @@ import Operations.RabbitMq.Queues ( queuesList )
 
 import Operations.RabbitMq.StartQueue ( startQueue )
 
+import Operations.Mongo.ConnectionMongoDB
+import Control.Monad.Trans (liftIO)
+
 connectBroker :: IO ()
 connectBroker = do
     loadEnv
@@ -23,6 +26,7 @@ connectBroker = do
     let txtPassword = pack password
 
     conn <- openConnection rabbitHost (pack "/") txtUsername txtPassword
+    connMongo <- liftIO connection
     let queues = queuesList
 
-    mapM_ (startQueue conn) queues
+    mapM_ (startQueue conn connMongo) queues
