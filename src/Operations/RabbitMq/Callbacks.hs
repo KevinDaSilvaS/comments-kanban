@@ -8,9 +8,10 @@ import Data.Aeson ( decode )
 import Control.Monad.Trans (liftIO)
 
 import Services.DeleteAllComments ( deleteAllComments )
+import Database.MongoDB ( Pipe, Database )
 
-callbackCommentsWhenTaskOrBoardIsDeleted :: (Message,Envelope) -> IO ()
-callbackCommentsWhenTaskOrBoardIsDeleted (msg, env) = do
+callbackCommentsWhenTaskOrBoardIsDeleted :: (Pipe, Database) -> (Message,Envelope) -> IO ()
+callbackCommentsWhenTaskOrBoardIsDeleted connMongo (msg, env) = do
     let decodedMessageBody = 
             decode (msgBody msg) :: Maybe BodyWhenTaskIsDeletedConsumer
                 
@@ -25,9 +26,9 @@ callbackCommentsWhenTaskOrBoardIsDeleted (msg, env) = do
                     putStrLn "received Nothing from broker"
                 Just body -> do 
                     putStrLn $ "received from broker: " ++ show body
-                    liftIO $ deleteAllComments "boardId" (boardId body)
+                    liftIO $ deleteAllComments connMongo "boardId" (boardId body)
                     
         Just body -> do 
                     putStrLn $ "received from broker: " ++ show body
-                    liftIO $ deleteAllComments "taskId" (taskId body)
+                    liftIO $ deleteAllComments connMongo "taskId" (taskId body)
     ackEnv env
