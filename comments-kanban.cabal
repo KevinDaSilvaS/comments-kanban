@@ -43,6 +43,7 @@ library
       Services.UpdateComment,
       Services.DeleteAllComments,
       Services.Integrations.MiniKanban.GetTaskInfo
+      Operations.Mongo.ConnectionMongoDB,
       Operations.Mongo.MongoDBOperations,
       Operations.RabbitMq.ConnectBroker,
       Operations.RabbitMq.Queues,
