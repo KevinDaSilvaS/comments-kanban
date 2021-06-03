@@ -8,8 +8,9 @@ import Network.HTTP.Conduit
 import Network.HTTP.Simple
 import System.IO ()
 
-import Helpers.ResponseTypes.SuccessSingleResponse (ReqResponse)
+import Helpers.ResponseTypes.SuccessSingleResponse ( ReqResponse )
 import Helpers.ResponseTypes.SuccessResponse ( ReqResponseArray )
+import Helpers.ResponseTypes.ErrorResponse ( ReqResponseError )
 
 getComment :: String -> String -> IO (Int, Maybe ReqResponse)
 getComment taskId commentId = do
@@ -20,6 +21,17 @@ getComment taskId commentId = do
   let status = getResponseStatusCode response
   let jsonBody = getResponseBody response
   let decodedBody = Aeson.decode jsonBody :: Maybe ReqResponse
+  return (status, decodedBody)
+
+getCommentError :: String -> String -> IO (Int, Maybe ReqResponseError)
+getCommentError taskId commentId = do
+  initReq <- parseRequest ("http://localhost:8835/comments/" ++ taskId ++ "/" ++ commentId)
+  let req = initReq { method = "GET" }
+  response <- httpLBS req
+  
+  let status = getResponseStatusCode response
+  let jsonBody = getResponseBody response
+  let decodedBody = Aeson.decode jsonBody :: Maybe ReqResponseError
   return (status, decodedBody)
 
 getAllComments :: String -> IO (Int, Maybe ReqResponseArray)
