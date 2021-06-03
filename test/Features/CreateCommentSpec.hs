@@ -33,7 +33,8 @@ createCommentFailSpec = hspec $
       isNothing (snd insertedComment) `shouldBe` (False :: Bool)
       let (Just errorMsg) = snd insertedComment
       RRE.code errorMsg `shouldBe` ("400" :: String)
-      RRE.details errorMsg `shouldBe` ("Error searching for task.(Tasks service may be temporarily unavailable)" :: String)
+      RRE.details errorMsg `shouldBe` (
+        "Error searching for task.(Tasks service may be temporarily unavailable)" :: String)
 
     it "Should return error 404 when task or board doesnt exist in mini-kanban" $ do
       let id = "any_taskId"
