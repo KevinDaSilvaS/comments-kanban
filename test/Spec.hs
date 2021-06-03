@@ -1,2 +1,11 @@
+import Test.Hspec
+
+--import Features.GetCommentSpec (getCommentSpec)
+import Features.CreateCommentSpec
+import Features.GetAllCommentsSpec
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = do 
+       createCommentSpec
+       getAllCommentsSpec
+       --getCommentSpec
