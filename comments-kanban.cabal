@@ -116,4 +116,5 @@ test-suite comments-kanban-test
     , aeson
     , mtl
     , containers
+    , text
   default-language: Haskell2010
