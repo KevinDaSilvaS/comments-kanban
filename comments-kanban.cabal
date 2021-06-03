@@ -111,4 +111,9 @@ test-suite comments-kanban-test
   build-depends:
       base >=4.7 && <5
     , comments-kanban
+    , hspec
+    , http-conduit
+    , aeson
+    , mtl
+    , containers
   default-language: Haskell2010
