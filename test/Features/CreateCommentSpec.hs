@@ -8,8 +8,8 @@ import qualified Helpers.ResponseTypes.ErrorResponse as RRE
 import qualified Helpers.ResponseTypes.SuccessSingleResponse as RR
 import SpecHelper
 
-createCommentSpec :: IO ()
-createCommentSpec = hspec $
+createCommentSuccessSpec :: IO ()
+createCommentSuccessSpec = hspec $
   describe "Success" $ do
   it "Should create one comment" $ do
     let id = "12s4f352j82sA8bB677"
@@ -22,22 +22,30 @@ createCommentSpec = hspec $
     taskId (RR.details comment) `shouldBe` (id :: String)
     boardId (RR.details comment) `shouldBe` (id :: String)
 
-  it "Should return error 400 when mini-kanban is not deployed" $ do
-    let id = "err500"
-    insertedComment <- liftIO (insertCommentError id)
-    fst insertedComment `shouldBe` (400 :: Int)
+createCommentFailSpec :: IO ()
+createCommentFailSpec = hspec $
+  describe "Fail" $ do
+    it "Should return error 400 when mini-kanban is not deployed" $ do
+      let id = "err500"
+      insertedComment <- liftIO (insertCommentError id)
+      fst insertedComment `shouldBe` (400 :: Int)
 
-    isNothing (snd insertedComment) `shouldBe` (False :: Bool)
-    let (Just errorMsg) = snd insertedComment
-    RRE.code errorMsg `shouldBe` ("400" :: String)
-    RRE.details errorMsg `shouldBe` ("Error searching for task.(Tasks service may be temporarily unavailable)" :: String)
+      isNothing (snd insertedComment) `shouldBe` (False :: Bool)
+      let (Just errorMsg) = snd insertedComment
+      RRE.code errorMsg `shouldBe` ("400" :: String)
+      RRE.details errorMsg `shouldBe` ("Error searching for task.(Tasks service may be temporarily unavailable)" :: String)
 
-  it "Should return error 404 when task or board doenst exist in mini-kanban" $ do
-    let id = "any_taskId"
-    insertedComment <- liftIO (insertCommentError id)
-    fst insertedComment `shouldBe` (404 :: Int)
+    it "Should return error 404 when task or board doesnt exist in mini-kanban" $ do
+      let id = "any_taskId"
+      insertedComment <- liftIO (insertCommentError id)
+      fst insertedComment `shouldBe` (404 :: Int)
 
-    isNothing (snd insertedComment) `shouldBe` (False :: Bool)
-    let (Just errorMsg) = snd insertedComment
-    RRE.code errorMsg `shouldBe` ("404" :: String)
-    RRE.details errorMsg `shouldBe` ("Task Not Found" :: String)
+      isNothing (snd insertedComment) `shouldBe` (False :: Bool)
+      let (Just errorMsg) = snd insertedComment
+      RRE.code errorMsg `shouldBe` ("404" :: String)
+      RRE.details errorMsg `shouldBe` ("Task Not Found" :: String)
+
+createCommentSpec :: IO ()
+createCommentSpec = do
+  createCommentSuccessSpec
+  createCommentFailSpec
