@@ -12,20 +12,20 @@ getAllCommentsSpec = hspec $ do
   describe "Success" $ do
     it "Should get all comments" $ do
       let id = "12s4f352j82sA8bB677"
-      insertedComment <- liftIO (getAllComments id)
-      fst insertedComment `shouldBe` (200 :: Int)
+      comments <- liftIO (getAllComments id)
+      fst comments `shouldBe` (200 :: Int)
 
-      isNothing (snd insertedComment) `shouldBe` (False :: Bool)
-      let (Just comment) = snd insertedComment
+      isNothing (snd comments) `shouldBe` (False :: Bool)
+      let (Just comment) = snd comments
       SR.code comment `shouldBe` ("200" :: String)
       length (SR.details comment) `shouldSatisfy` (> 0)
 
-  it "Should get en empty list when taskId doensnt exist" $ do
+  it "Should get en empty list when taskId doesnt exist" $ do
     let id = "non_existent_taskId"
-    insertedComment <- liftIO (getAllComments id)
-    fst insertedComment `shouldBe` (200 :: Int)
+    comments <- liftIO (getAllComments id)
+    fst comments `shouldBe` (200 :: Int)
 
-    isNothing (snd insertedComment) `shouldBe` (False :: Bool)
-    let (Just comment) = snd insertedComment
+    isNothing (snd comments) `shouldBe` (False :: Bool)
+    let (Just comment) = snd comments
     SR.code comment `shouldBe` ("200" :: String)
     length (SR.details comment) `shouldSatisfy` (== 0)
