@@ -11,10 +11,17 @@ import System.IO ()
 import Helpers.ResponseTypes.SuccessSingleResponse ( ReqResponse )
 import Helpers.ResponseTypes.SuccessResponse ( ReqResponseArray )
 import Helpers.ResponseTypes.ErrorResponse ( ReqResponseError )
+import LoadEnv
+import System.Environment (lookupEnv)
 
 getComment :: String -> String -> IO (Int, Maybe ReqResponse)
 getComment taskId commentId = do
-  initReq <- parseRequest ("http://localhost:8835/comments/" ++ taskId ++ "/" ++ commentId)
+  loadEnv
+  (Just port) <- lookupEnv "PORT"
+  let url = "http://localhost:" ++ port ++ 
+        "/comments/" ++ taskId ++ "/" ++ commentId
+
+  initReq <- parseRequest url
   let req = initReq { method = "GET" }
   response <- httpLBS req
 
@@ -25,7 +32,12 @@ getComment taskId commentId = do
 
 getCommentError :: String -> String -> IO (Int, Maybe ReqResponseError)
 getCommentError taskId commentId = do
-  initReq <- parseRequest ("http://localhost:8835/comments/" ++ taskId ++ "/" ++ commentId)
+  loadEnv
+  (Just port) <- lookupEnv "PORT"
+  let url = "http://localhost:" ++ port ++ "/comments/" 
+        ++ taskId ++ "/" ++ commentId
+        
+  initReq <- parseRequest url
   let req = initReq { method = "GET" }
   response <- httpLBS req
   
@@ -36,7 +48,11 @@ getCommentError taskId commentId = do
 
 getAllComments :: String -> IO (Int, Maybe ReqResponseArray)
 getAllComments taskId = do
-    initReq <- parseRequest ("http://localhost:8835/comments/" ++ taskId)
+    loadEnv
+    (Just port) <- lookupEnv "PORT"
+    let url = "http://localhost:" ++ port ++ "/comments/" ++ taskId
+
+    initReq <- parseRequest url
     let req = initReq { method = "GET" }
     response <- httpLBS req
   
