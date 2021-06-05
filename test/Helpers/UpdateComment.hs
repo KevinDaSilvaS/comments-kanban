@@ -11,9 +11,15 @@ import Network.HTTP.Simple
 import System.IO ()
 import Data.Text (pack)
 
+import LoadEnv
+import System.Environment (lookupEnv)
+
 updateComment :: String -> IO Int
 updateComment commentId = do
-  initReq <- parseRequest ("http://localhost:8835/comments/" ++ commentId)
+  loadEnv
+  (Just port) <- lookupEnv "PORT"
+  let url = "http://localhost:" ++ port ++ "/comments/" ++ commentId
+  initReq <- parseRequest url
   let req =
         initReq
           { method = "PATCH",
@@ -28,7 +34,10 @@ updateComment commentId = do
 
 updateCommentError :: String -> String -> String -> IO (Int, Maybe ReqResponseError)
 updateCommentError commentId field value = do
-  initReq <- parseRequest ("http://localhost:8835/comments/" ++ commentId)
+  loadEnv
+  (Just port) <- lookupEnv "PORT"
+  let url = "http://localhost:" ++ port ++ "/comments/" ++ commentId
+  initReq <- parseRequest url
   let req =
         initReq
           { method = "PATCH",

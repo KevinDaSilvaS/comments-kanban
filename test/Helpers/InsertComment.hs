@@ -11,9 +11,14 @@ import System.IO ()
 import Helpers.ResponseTypes.SuccessSingleResponse (ReqResponse)
 import Helpers.ResponseTypes.ErrorResponse (ReqResponseError)
 
+import LoadEnv
+import System.Environment (lookupEnv)
+
 insertComment :: String -> IO (Int, Maybe ReqResponse)
 insertComment identifier = do
-  initReq <- parseRequest "http://localhost:8835/comments/"
+  loadEnv
+  (Just port) <- lookupEnv "PORT"
+  initReq <- parseRequest ("http://localhost:" ++ port ++ "/comments/")
   let req =
         initReq
           { method = "POST",
@@ -35,7 +40,9 @@ insertComment identifier = do
 
 insertCommentError :: String -> IO (Int, Maybe ReqResponseError)
 insertCommentError identifier = do
-  initReq <- parseRequest "http://localhost:8835/comments/"
+  loadEnv
+  (Just port) <- lookupEnv "PORT"
+  initReq <- parseRequest ("http://localhost:" ++ port ++ "/comments/")
   let req =
         initReq
           { method = "POST",
