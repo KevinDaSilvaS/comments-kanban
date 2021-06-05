@@ -10,6 +10,5 @@ errorJson code message =
   json $
     object
       [ pack "code" .= show code,
-        pack "details" .= String message,
-        pack "error" .= object [pack "code" .= show code, pack "message" .= String message]
+        pack "details" .= String message
       ]
