@@ -15,10 +15,4 @@ queuesListConsumers = [
     "com.*")
     ]
 
-queuesListPublishers = [
-        ("telegraf",
-        "callback",
-        "telegraf",
-        "topic",
-        "#")
-        ]
+queuesListPublishers = []

@@ -26,19 +26,19 @@ main = do
     chan <- channelAmqpBroker conn
     connectBroker conn chan
     spockCfg <- defaultSpockCfg () PCNoDatabase ()
-    runSpock 8835 (spock spockCfg (app chan))
+    runSpock 8835 (spock spockCfg app)
 
-app :: Channel -> Api
-app chan = do
+app :: Api
+app = do
     conn <- liftIO connection
     middleware simpleCors
     
-    getComment conn chan
+    getComment conn
 
-    getAllComments conn chan
+    getAllComments conn
 
-    deleteComment conn chan
+    deleteComment conn
 
-    insertComment conn chan
+    insertComment conn
 
-    updateComment conn chan
+    updateComment conn
