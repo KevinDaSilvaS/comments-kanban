@@ -12,9 +12,10 @@ import Errors.ErrorMessages
 import Operations.Mongo.MongoDBOperations as MongoOperations
 import Control.Monad.Trans (liftIO)
 import Database.MongoDB ( Pipe, Database )
+import Network.AMQP
 
-updateComment :: (Pipe, Database) -> Api
-updateComment connection = do
+updateComment :: (Pipe, Database) -> Channel -> Api
+updateComment connection chan = do
     patch ("comments" <//> var) $ \commentId -> do
         body <- jsonBody :: ApiAction (Maybe PATCHR.PatchCommentRequest)
         case body of

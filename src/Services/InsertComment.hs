@@ -21,9 +21,10 @@ import Response.Response as Res
 
 import Helpers.GenerateUUID
 import Database.MongoDB ( Pipe, Database )
+import Network.AMQP
 
-insertComment :: (Pipe, Database) -> Api
-insertComment connection = do
+insertComment :: (Pipe, Database) -> Channel -> Api
+insertComment connection chan = do
     post "comments" $ do
         body <- jsonBody :: ApiAction (Maybe PR.PostCommentRequest)
         if isNothing body then

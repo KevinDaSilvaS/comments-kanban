@@ -15,9 +15,10 @@ import Response.Response as Res
 import Network.HTTP.Types
 import Errors.ErrorMessages
 import Database.MongoDB ( Pipe, Database )
+import Network.AMQP
 
-getComment :: (Pipe, Database) -> Api
-getComment connection = do
+getComment :: (Pipe, Database) -> Channel -> Api
+getComment connection chan = do
     get ("comments" <//> var <//> var) $ \taskId commentId -> do
         comment <- liftIO $ MongoOperations.getComment 
             connection taskId commentId
