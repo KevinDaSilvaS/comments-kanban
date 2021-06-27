@@ -6,8 +6,13 @@ import Operations.RabbitMq.Callbacks
 import Network.AMQP ( Envelope, Message ) 
 import Database.MongoDB ( Pipe, Database )
 
-queuesList :: [([Char], (Pipe, Database) -> (Message, Envelope) -> IO ())]
-queuesList = [
+queuesListConsumers :: [([Char], (Pipe, Database) -> (Message, Envelope) -> IO (), [Char], [Char], [Char])]
+queuesListConsumers = [
     ("comments-service-delete-all-comments-when-task-or-board-is-deleted",
-    callbackCommentsWhenTaskOrBoardIsDeleted)
+    callbackCommentsWhenTaskOrBoardIsDeleted,
+    "topic-Mini-Kanban",
+    "topic",
+    "com.*")
     ]
+
+queuesListPublishers = []

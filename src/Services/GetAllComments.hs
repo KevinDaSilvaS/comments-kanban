@@ -15,7 +15,7 @@ import Network.HTTP.Types
 import Database.MongoDB ( Pipe, Database )
     
 getAllComments :: (Pipe, Database) -> Api
-getAllComments connection = do
+getAllComments connection= do
     get ("comments" <//> var) $ \taskId -> do
         comments <- liftIO $ MongoOperations.getAllComments connection taskId
         Res.response (statusCode status200) comments

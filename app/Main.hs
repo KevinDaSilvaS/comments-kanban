@@ -16,12 +16,15 @@ import Services.UpdateComment  ( updateComment )
 import Network.Wai.Middleware.Cors
 
 import Operations.RabbitMq.ConnectBroker
+import Network.AMQP
 import Operations.Mongo.ConnectionMongoDB
 import Control.Monad.Trans (liftIO)
 
 main :: IO ()
 main = do
-    connectBroker
+    conn <- connectionAmqpBroker
+    chan <- channelAmqpBroker conn
+    connectBroker conn chan
     spockCfg <- defaultSpockCfg () PCNoDatabase ()
     runSpock 8835 (spock spockCfg app)
 

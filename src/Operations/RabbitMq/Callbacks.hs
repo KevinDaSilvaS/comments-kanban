@@ -2,7 +2,6 @@ module Operations.RabbitMq.Callbacks where
 
 import Network.AMQP ( ackEnv, Envelope, Message(msgBody) )
 import BaseTypes.MessageTypes
-    {- ( BodyWhenTaskIsDeletedConsumer(taskId) ) -}
 import Data.Aeson ( decode )
 
 import Control.Monad.Trans (liftIO)
@@ -31,4 +30,4 @@ callbackCommentsWhenTaskOrBoardIsDeleted connMongo (msg, env) = do
         Just body -> do 
                     putStrLn $ "received from broker: " ++ show body
                     liftIO $ deleteAllComments connMongo "taskId" (taskId body)
-    ackEnv env
+    ackEnv env  
