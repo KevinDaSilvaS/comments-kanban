@@ -16,26 +16,29 @@ import Services.UpdateComment  ( updateComment )
 import Network.Wai.Middleware.Cors
 
 import Operations.RabbitMq.ConnectBroker
+import Network.AMQP
 import Operations.Mongo.ConnectionMongoDB
 import Control.Monad.Trans (liftIO)
 
 main :: IO ()
 main = do
-    connectBroker
+    conn <- connectionAmqpBroker
+    chan <- channelAmqpBroker conn
+    connectBroker conn chan
     spockCfg <- defaultSpockCfg () PCNoDatabase ()
-    runSpock 8835 (spock spockCfg app)
+    runSpock 8835 (spock spockCfg (app chan))
 
-app :: Api
-app = do
+app :: Channel -> Api
+app chan = do
     conn <- liftIO connection
     middleware simpleCors
     
-    getComment conn
+    getComment conn chan
 
-    getAllComments conn
+    getAllComments conn chan
 
-    deleteComment conn
+    deleteComment conn chan
 
-    insertComment conn
+    insertComment conn chan
 
-    updateComment conn
+    updateComment conn chan
