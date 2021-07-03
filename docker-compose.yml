@@ -20,7 +20,7 @@ services:
             - MONGO_DB_NAME=${MONGO_DB_NAME}
             - MONGO_HOST=mongo
             - CHECK_TASK_URL=${CHECK_TASK_URL}
-            - RABBIT_HOST=eg-gateway_rabbit-mq_1
+            - RABBIT_HOST=krakend-gateway_rabbit-mq_1
             - RABBIT_USERNAME=${RABBIT_USERNAME}
             - RABBIT_PASSWORD=${RABBIT_PASSWORD}
         build: 
@@ -50,5 +50,5 @@ networks:
     kanban:
         driver: overlay
         external: 
-            name: eg-gateway_kanban
+            name: krakend-gateway_kanban
             
