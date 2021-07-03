@@ -33,14 +33,6 @@ services:
             - kanban
             - comments_app
 
-    docs:
-        image: comments_docs
-        build: 
-            context: ./collections
-        ports: 
-            - "${DOCS_PORT}:5000"
-        networks:
-            - comments_app
 networks:
     comments_app:
         driver: bridge
