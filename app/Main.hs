@@ -20,7 +20,6 @@ import Network.AMQP
 import Operations.Mongo.ConnectionMongoDB
 import Control.Monad.Trans (liftIO)
 import Operations.Redis.ConnectionRedis
-import qualified Database.Redis as RD
 
 main :: IO ()
 main = do
