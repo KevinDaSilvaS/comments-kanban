@@ -8,9 +8,10 @@ import Control.Monad.Trans (liftIO)
 
 import Services.DeleteAllComments ( deleteAllComments )
 import Database.MongoDB ( Pipe, Database )
+import Operations.Redis.RedisOperations ( removeKeysByPattern )
+import qualified Data.ByteString.Char8 as CHAR8
 
-callbackCommentsWhenTaskOrBoardIsDeleted :: (Pipe, Database) -> (Message,Envelope) -> IO ()
-callbackCommentsWhenTaskOrBoardIsDeleted connMongo (msg, env) = do
+callbackCommentsWhenTaskOrBoardIsDeleted connMongo connRedis (msg, env) = do
     let decodedMessageBody = 
             decode (msgBody msg) :: Maybe BodyWhenTaskIsDeletedConsumer
                 
@@ -25,9 +26,15 @@ callbackCommentsWhenTaskOrBoardIsDeleted connMongo (msg, env) = do
                     putStrLn "received Nothing from broker"
                 Just body -> do 
                     putStrLn $ "received from broker: " ++ show body
-                    liftIO $ deleteAllComments connMongo "boardId" (boardId body)
+                    deleteAllComments connMongo "boardId" (boardId body)
+                    removeKeysByPattern connRedis 
+                            (CHAR8.pack ("*"++boardId body++"*"))
+                    return ()
                     
         Just body -> do 
                     putStrLn $ "received from broker: " ++ show body
-                    liftIO $ deleteAllComments connMongo "taskId" (taskId body)
+                    deleteAllComments connMongo "taskId" (taskId body)
+                    removeKeysByPattern connRedis 
+                        (CHAR8.pack ("*"++taskId body++"*"))
+                    return ()
     ackEnv env  

@@ -21,15 +21,16 @@ import Response.Response as Res
 
 import Helpers.GenerateUUID
 import Database.MongoDB ( Pipe, Database )
+import Database.Redis ( Connection )
 
-insertComment :: (Pipe, Database) -> Api
-insertComment connection = do
+insertComment :: (Pipe, Database) -> Connection -> Api
+insertComment connection connectionRedis = do
     post "comments" $ do
         body <- jsonBody :: ApiAction (Maybe PR.PostCommentRequest)
         if isNothing body then
             setStatus status400 >> _PARSING_POST_BODY
         else do
-            taskIntegration <- liftIO $ getTaskInfo body
+            taskIntegration <- liftIO $ getTaskInfo body connectionRedis
 
             case taskIntegration of
                 200 -> do

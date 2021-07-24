@@ -38,6 +38,14 @@ services:
             - "1747:3000"
         networks: 
             - comments_app
+    
+    redis:
+        image: redis
+        command: redis-server --requirepass ${REDIS_PASSWORD}
+        ports:
+            - "${REDIS_PORT}:6379"
+        networks:
+            - comments_app
 networks:
     comments_app:
         driver: bridge

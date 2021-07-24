@@ -19,6 +19,7 @@ import Operations.RabbitMq.ConnectBroker
 import Network.AMQP
 import Operations.Mongo.ConnectionMongoDB
 import Control.Monad.Trans (liftIO)
+import Operations.Redis.ConnectionRedis
 
 main :: IO ()
 main = do
@@ -31,6 +32,7 @@ main = do
 app :: Api
 app = do
     conn <- liftIO connection
+    connRedis <- liftIO connectRedis
     middleware simpleCors
     
     getComment conn
@@ -39,6 +41,6 @@ app = do
 
     deleteComment conn
 
-    insertComment conn
+    insertComment conn connRedis
 
     updateComment conn
