@@ -12,8 +12,10 @@ import Control.Monad.Trans (liftIO)
 import LoadEnv
 import System.Environment (lookupEnv)
 import qualified Data.ByteString.Char8 as CHAR8
-import Operations.Redis.RedisOperations
+import Operations.Redis.RedisOperations ( getKey, setKey )
+import Database.Redis
 
+getTaskInfo :: Maybe PR.PostCommentRequest -> Connection -> IO Int
 getTaskInfo body connectionRedis = do
     liftIO loadEnv
     maybeUrl <- liftIO (lookupEnv "CHECK_TASK_URL")
