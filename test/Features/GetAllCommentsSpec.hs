@@ -20,6 +20,16 @@ getAllCommentsSpec = hspec $ do
       SR.code comment `shouldBe` ("200" :: String)
       length (SR.details comment) `shouldSatisfy` (> 0)
 
+    it "Should get one comment using pagination" $ do
+      let id = "12s4f352j82sA8bB677"
+      comments <- liftIO (getAllCommentsPaginated id 1 1)
+      fst comments `shouldBe` (200 :: Int)
+
+      isNothing (snd comments) `shouldBe` (False :: Bool)
+      let (Just comment) = snd comments
+      SR.code comment `shouldBe` ("200" :: String)
+      length (SR.details comment) `shouldSatisfy` (== 1)
+
   it "Should get en empty list when taskId doesnt exist" $ do
     let id = "non_existent_taskId"
     comments <- liftIO (getAllComments id)
