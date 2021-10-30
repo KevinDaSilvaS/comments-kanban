@@ -60,3 +60,18 @@ getAllComments taskId = do
     let jsonBody = getResponseBody response
     let decodedBody = Aeson.decode jsonBody :: Maybe ReqResponseArray
     return (status, decodedBody)
+
+getAllCommentsPaginated taskId page limit = do
+    loadEnv
+    (Just port) <- lookupEnv "PORT"
+    let queryParams = "?page=" ++ show page ++ "&limit=" ++ show limit
+    let url = "http://localhost:" ++ port ++ "/comments/" ++ taskId ++ queryParams
+    
+    initReq <- parseRequest url
+    let req = initReq { method = "GET" }
+    response <- httpLBS req
+      
+    let status = getResponseStatusCode response
+    let jsonBody = getResponseBody response
+    let decodedBody = Aeson.decode jsonBody :: Maybe ReqResponseArray
+    return (status, decodedBody)
