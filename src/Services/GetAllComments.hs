@@ -17,7 +17,7 @@ import Database.MongoDB ( Pipe, Database, Limit )
 getAllComments :: (Pipe, Database) -> Api
 getAllComments connection = do
     let defaultLimit = 50
-    let defaultPage  = 0
+    let defaultPage  = 1
     get ("comments" <//> var) $ \taskId -> do
         maybePage  <- param "page" 
         maybeLimit <- param "limit"
@@ -25,17 +25,19 @@ getAllComments connection = do
             Just page -> do
                 case maybeLimit of
                     Just limit -> do 
-                        comments <- fetchResults 
-                            connection taskId ((page-1)*limit) limit
+                        comments <- fetchResults connection taskId page limit
                         Res.response (statusCode status200) comments
                     _ -> do
-                        comments <- fetchResults
-                            connection taskId ((page-1)*defaultLimit) defaultLimit
+                        comments <- fetchResults 
+                            connection taskId page defaultLimit
                         Res.response (statusCode status200) comments
             _ -> do
                 comments <- 
                     fetchResults connection taskId defaultPage defaultLimit
                 Res.response (statusCode status200) comments
                 
-fetchResults connection taskId page limit = 
-    liftIO $ MongoOperations.getAllComments connection taskId page limit
+fetchResults connection taskId page limit 
+    | page <= 0 = liftIO $ 
+        MongoOperations.getAllComments connection taskId 0 limit
+    | otherwise = liftIO $ 
+        MongoOperations.getAllComments connection taskId ((page-1)*limit) limit
