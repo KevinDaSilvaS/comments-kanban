@@ -17,7 +17,7 @@ import Database.MongoDB ( Pipe, Database, Limit )
 getAllComments :: (Pipe, Database) -> Api
 getAllComments connection = do
     let defaultLimit = 50
-    let defaultPage  = 1
+    let defaultPage  = 0
     get ("comments" <//> var) $ \taskId -> do
         maybePage  <- param "page" 
         maybeLimit <- param "limit"
