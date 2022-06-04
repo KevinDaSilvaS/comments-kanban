@@ -20,22 +20,29 @@ import Network.AMQP
 import Operations.Mongo.ConnectionMongoDB
 import Control.Monad.Trans (liftIO)
 import Operations.Redis.ConnectionRedis
+import Logger.Logger(startLogger, logger)
+import Logger.Styles(_info)
 
 main :: IO ()
 main = do
+    mvar <- startLogger
+    let _logger = logger mvar
+
     conn <- connectionAmqpBroker
     chan <- channelAmqpBroker conn
     connectBroker conn chan
     spockCfg <- defaultSpockCfg () PCNoDatabase ()
-    runSpock 8835 (spock spockCfg app)
+    runSpock 8835 (spock spockCfg (app _logger))
 
-app :: Api
-app = do
-    conn <- liftIO connection
+app :: ([Char] -> [Char] -> IO ()) -> Api
+app _logger = do
+    liftIO $ _logger _info "Server started"
+
+    conn      <- liftIO connection
     connRedis <- liftIO connectRedis
     middleware simpleCors
     
-    getComment conn
+    getComment conn _logger
 
     getAllComments conn
 
