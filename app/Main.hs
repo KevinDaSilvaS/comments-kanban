@@ -44,10 +44,10 @@ app _logger = do
     
     getComment conn _logger
 
-    getAllComments conn
+    getAllComments conn _logger
 
-    deleteComment conn
+    deleteComment conn _logger
 
-    insertComment conn connRedis
+    insertComment conn connRedis _logger
 
-    updateComment conn
+    updateComment conn _logger
