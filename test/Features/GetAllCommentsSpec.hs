@@ -50,7 +50,7 @@ getAllCommentsSpec = hspec $ do
       SR.code comment `shouldBe` ("200" :: String)
       length (SR.details comment) `shouldSatisfy` (>= 1)
 
-  it "Should get en empty list when taskId doesnt exist" $ do
+  it "Should get an empty list when taskId doesnt exist" $ do
     let id = "non_existent_taskId"
     comments <- liftIO (getAllComments id)
     fst comments `shouldBe` (200 :: Int)
