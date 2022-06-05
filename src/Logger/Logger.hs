@@ -1,6 +1,6 @@
 module Logger.Logger where
 
-import Logger.Styles--(format)
+import Logger.Styles(format)
 import Control.Concurrent
 import Control.Monad(forever)
 
