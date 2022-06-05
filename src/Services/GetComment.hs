@@ -2,7 +2,7 @@
 
 module Services.GetComment where
 
-import Web.Spock
+import Web.Spock(get, (<//>), var, setStatus)
 
 import BaseTypes.Comment
     ( Comment(Comment, content, taskId, commentId, boardId) )
@@ -32,4 +32,4 @@ getComment connection _logger = do
                 setStatus status404 >> _COMMENT_NOT_FOUND
             _ -> do
                 liftIO $ _logger _green "[GET 200 - Get one comment] Comment found"
-                Res.responseSimple (statusCode status200) (Prelude.head comment)
+                Res.responseSimple (statusCode status200) (head comment)
