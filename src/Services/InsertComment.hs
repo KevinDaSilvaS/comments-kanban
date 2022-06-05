@@ -22,33 +22,48 @@ import Response.Response as Res
 import Helpers.GenerateUUID
 import Database.MongoDB ( Pipe, Database )
 import Database.Redis ( Connection )
+import Logger.Styles(_info, _error, _green)
 
-insertComment :: (Pipe, Database) -> Connection -> Api
-insertComment connection connectionRedis = do
+insertComment :: (Pipe, Database) -> Connection -> ([Char] -> [Char] -> IO())-> Api
+insertComment connection connectionRedis _logger = do
     post "comments" $ do
+        liftIO $ _logger _info "[POST - Create comment]"
+
         body <- jsonBody :: ApiAction (Maybe PR.PostCommentRequest)
-        if isNothing body then
-            setStatus status400 >> _PARSING_POST_BODY
-        else do
-            taskIntegration <- liftIO $ getTaskInfo body connectionRedis
 
-            case taskIntegration of
-                200 -> do
-                    let (Just sanitizeBody) = body
-                    uuid <- liftIO generateUUID
+        case isNothing body of
+            True -> do
+                liftIO $ _logger _error "[POST 400 - Error parsing request body]"
+                setStatus status400 >> _PARSING_POST_BODY
+            _    -> do
+                taskIntegration <- liftIO $ getTaskInfo body connectionRedis
+                let continue = returnedTaskInfo taskIntegration
+                continue connection body _logger
 
-                    let comment = CM.Comment {
-                        CM.content   = PR.content sanitizeBody,
-                        CM.taskId    = PR.taskId sanitizeBody,
-                        CM.boardId   = PR.boardId sanitizeBody,
-                        CM.commentId = uuid
-                    }
+returnedTaskInfo 200 = createComment
+returnedTaskInfo 404 = taskNotFound
+returnedTaskInfo _   = errorSearchingTask
 
-                    insertedComment <- liftIO $ 
-                        MongoOperations.insertComment connection comment
+createComment connection body _logger = do
+    let (Just sanitizeBody) = body
+    uuid <- liftIO generateUUID
 
-                    setStatus status201 >> Res.responseSimple 
-                        (statusCode status201) insertedComment
+    let comment = CM.Comment {
+        CM.content   = PR.content sanitizeBody,
+        CM.taskId    = PR.taskId sanitizeBody,
+        CM.boardId   = PR.boardId sanitizeBody,
+        CM.commentId = uuid
+    }
 
-                404 -> do setStatus status404 >> _TASK_NOT_FOUND
-                _   -> do setStatus status400 >> _ERROR_SEARCHING_TASK
+    insertedComment <- liftIO $ MongoOperations.insertComment connection comment
+
+    liftIO $ _logger _green "[POST 201 - Comment created]"
+    setStatus status201 >> Res.responseSimple (statusCode status201) insertedComment
+
+taskNotFound _ _ _logger = do 
+    liftIO $ _logger _error "[POST 404 - Task not found]"
+    setStatus status404 >> _TASK_NOT_FOUND
+
+errorSearchingTask _ _ _logger = do 
+    liftIO $ _logger _error "[POST 400 - Error searching task]"
+    setStatus status400 >> _ERROR_SEARCHING_TASK
